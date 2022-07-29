@@ -7,6 +7,10 @@
   "scripts": {
     "test": "mocha ./tests/test.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zoodogood/import-directory"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
