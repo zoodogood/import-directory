@@ -42,6 +42,7 @@ const importDirectory = new ImportDirectory(options);
 const modules = await importDirectory.import(path);
 
 for (const module of modules){
+  // You will see the data exported from the file, equal to what you get with a normal import
   console.info(module);
 }
 ```
