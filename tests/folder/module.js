@@ -1,1 +1,1 @@
-export default "Random Value"
+export default "1"

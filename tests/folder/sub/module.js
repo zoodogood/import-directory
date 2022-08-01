@@ -1,1 +1,1 @@
-export default "Random value in subfolder";
+export default "2";
