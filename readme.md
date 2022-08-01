@@ -2,7 +2,17 @@
 ## Dynamically imports all files from a directory.
 > **Warning:**  
 > Supports only ES6 import*!
-#### Usage
+#### Basic usage
+```js
+import { ImportDirectory } from '@zoodogood/import-directory';
+
+const path = "./folder";
+
+const modules = await ImportDirectory({})
+  .import(path);
+```
+
+### With details
 ```js
 import { ImportDirectory } from '@zoodogood/import-directory';
 
@@ -28,6 +38,10 @@ const options = {
 const path = "./folder";
 
 
-const result = await new ImportDirectory(options)
-  .import(path);
+const importDirectory = new ImportDirectory(options);
+const modules = await importDirectory.import(path);
+
+for (const module of modules){
+  console.info(module);
+}
 ```
