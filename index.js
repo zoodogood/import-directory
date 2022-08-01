@@ -4,7 +4,7 @@ import Path from 'path';
 const DEFAULT_REGEX = /^[^.].+?\.js$/i;
 
 class ImportDirectory {
-  constructor({sync = true, subfolders = false, regex = DEFAULT_REGEX, callback, skipValidation = false}){
+  constructor({sync = true, subfolders = false, regex = DEFAULT_REGEX, callback, skipValidation = false} = {}){
     this.sync       = sync;
     this.subfolders = subfolders;
     this.regex      = regex;

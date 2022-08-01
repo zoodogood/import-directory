@@ -8,7 +8,7 @@ import { ImportDirectory } from '@zoodogood/import-directory';
 
 const path = "./folder";
 
-const modules = await ImportDirectory({})
+const modules = await ImportDirectory()
   .import(path);
 ```
 
