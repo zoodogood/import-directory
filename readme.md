@@ -1,4 +1,4 @@
-[NPM](https://www.npmjs.com/package/@zoodogood/import-directory) [GITHUB](https://github.com/zoodogood/import-directory)  
+[NPM](https://www.npmjs.com/package/@zoodogood/import-directory), [GITHUB](https://github.com/zoodogood/import-directory)  
 ## Dynamically imports all files from a directory.
 > **Warning:**  
 > Supports only ES6 import*!
@@ -12,7 +12,7 @@ const modules = await ImportDirectory({})
   .import(path);
 ```
 
-### With details
+#### With details
 ```js
 import { ImportDirectory } from '@zoodogood/import-directory';
 
