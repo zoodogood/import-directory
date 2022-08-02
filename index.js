@@ -4,13 +4,15 @@ import Path from 'path';
 const DEFAULT_REGEX = /^[^.].*?\.js$/i;
 
 class ImportDirectory {
-  constructor({sync = true, subfolders = false, regex = DEFAULT_REGEX, callback, skipValidation = false} = {}){
+  constructor({sync = true, subfolders = false, regex = DEFAULT_REGEX, callback, skipValidation = false, rootDirectory} = {}){
     this.sync       = sync;
     this.subfolders = subfolders;
     this.regex      = regex;
     this.callback   = callback;
 
     this.skipValidation = skipValidation;
+
+    this.rootDirectory = rootDirectory ?? process.cwd();
   }
 
 
@@ -46,6 +48,8 @@ class ImportDirectory {
 
 
   async import(directoryPath){
+    directoryPath = this.#toAbsolutePath(directoryPath);
+
     const filesPath = this.takeFilesPath({path: directoryPath, subfolders: this.subfolders})
       .filter((path) => this.regex.test(Path.basename( path )));
 
@@ -85,6 +89,15 @@ class ImportDirectory {
       return path;
 
     return `file:${ path }`;
+  }
+
+  #toAbsolutePath(path){
+    const isAbsolute = Path.isAbsolute(path);
+    if (isAbsolute){
+      return path;
+    }
+  
+    path = `${ this.rootDirectory }/${ path }`;
   }
 
 }
