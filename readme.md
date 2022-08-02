@@ -33,7 +33,7 @@ const options = {
   // Check if files are folders
   skipValidation: false,
 
-  // Required for relative paths to correctly properly
+  // Required for relative paths to work properly
   rootDirectory: process.cwd()
 }
 
