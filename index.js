@@ -15,8 +15,38 @@ class ImportDirectory {
     this.rootDirectory = rootDirectory ?? process.cwd();
   }
 
+  async import(directoryPath){
+
+    const filesPath = this.takeFilesPath({path: directoryPath, subfolders: this.subfolders})
+      .filter((path) => this.regex.test(Path.basename( path )));
+
+    const list = [];
+    const promises = [];
+
+
+    for (let path of filesPath){
+
+      const promise = this.importFile(path)
+        .then(moduleImport => {
+          list.push(moduleImport);
+          this.callback?.({ path, module: moduleImport });
+        });
+
+
+      this.sync ?
+        await promise :
+        promises.push(promise);
+
+    }
+
+    await Promise.all(promises);
+    return list;
+  }
+
 
   takeFilesPath({ path, subfolders, skipValidation }){
+    path = this.#toAbsolutePath(path);
+
     const filesPath = FileSystem.readdirSync( path )
       .map(name => `${ path }/${ name }`);
 
@@ -46,40 +76,15 @@ class ImportDirectory {
     return files;
   }
 
-
-  async import(directoryPath){
-    directoryPath = this.#toAbsolutePath(directoryPath);
-
-    const filesPath = this.takeFilesPath({path: directoryPath, subfolders: this.subfolders})
-      .filter((path) => this.regex.test(Path.basename( path )));
-
-    const list = [];
-    const promises = [];
-
-
-    for (let path of filesPath){
-
-      const promise = this.importFile(path)
-        .then(moduleImport => {
-          list.push(moduleImport);
-          this.callback?.({ path, module: moduleImport });
-        });
-
-
-      this.sync ?
-        await promise :
-        promises.push(promise);
-
-    }
-
-    await Promise.all(promises);
-    return list;
-  }
-
   async importFile(path){
-    path = this.#normalizePath(path);
+    path = this.#normalizePath(
+      this.#toAbsolutePath(path)
+    );
+
     return await import(path);
   }
+
+
 
 
   fileIsFolder(filePath){
