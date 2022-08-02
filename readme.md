@@ -25,7 +25,7 @@ const options = {
   subfolders: false,
 
   // Ignore files not matching regular expression. Default all files that do not start with a dot and end with `.js`
-  regex: /^[^.].+?\.js$/i,
+  regex: /^[^.].*?\.js$/i,
 
   // Call a function on every import
   callback: null,
