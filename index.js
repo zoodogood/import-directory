@@ -58,9 +58,8 @@ class ImportDirectory {
 
 
     for (let path of filesPath){
-      path = this.#normalizePath(path);
 
-      const promise = import(path)
+      const promise = this.importFile(path)
         .then(moduleImport => {
           list.push(moduleImport);
           this.callback?.({ path, module: moduleImport });
@@ -75,6 +74,11 @@ class ImportDirectory {
 
     await Promise.all(promises);
     return list;
+  }
+
+  async importFile(path){
+    path = this.#normalizePath(path);
+    return await import(path);
   }
 
 
