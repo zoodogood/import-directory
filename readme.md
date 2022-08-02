@@ -31,7 +31,10 @@ const options = {
   callback: null,
 
   // Check if files are folders
-  skipValidation: false
+  skipValidation: false,
+
+  // Required for relative paths to correctly properly
+  rootDirectory: process.cwd()
 }
 
 // Relative path from project root folder or absolute path.
