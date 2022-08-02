@@ -96,8 +96,9 @@ class ImportDirectory {
     if (isAbsolute){
       return path;
     }
-  
+
     path = `${ this.rootDirectory }/${ path }`;
+    return path;
   }
 
 }
