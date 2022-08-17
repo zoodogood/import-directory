@@ -8,8 +8,10 @@ import { ImportDirectory } from '@zoodogood/import-directory';
 
 const path = "./folder";
 
-const modules = await ImportDirectory()
+const modules = await new ImportDirectory()
   .import(path);
+
+modules.forEach(moduleExport => /*...*/)
 ```
 
 #### With details
@@ -24,7 +26,7 @@ const options = {
   // Import files from subfolders
   subfolders: false,
 
-  // Ignore files not matching regular expression. Default all files that do not start with a dot and end with `.js`
+  // Ignore files not matching regular expression. Default all files that do not start with a dot and ending with `.js`
   regex: /^[^.].*?\.js$/i,
 
   // Call a function on every import
