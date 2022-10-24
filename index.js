@@ -1,7 +1,7 @@
 import FileSystem from 'fs';
 import Path from 'path';
 
-const DEFAULT_REGEX = /^[^.].*?\.js$/i;
+const DEFAULT_REGEX = /^[^.].*?\.(?:js|ts)$/i;
 
 class ImportDirectory {
   constructor({sync = true, subfolders = false, regex = DEFAULT_REGEX, callback, skipValidation = false, rootDirectory} = {}){
@@ -24,7 +24,7 @@ class ImportDirectory {
     const promises = [];
 
 
-    for (let path of filesPath){
+    for (const path of filesPath){
 
       const promise = this.importFile(path)
         .then(moduleImport => {
