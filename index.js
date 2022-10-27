@@ -1,4 +1,4 @@
-import FileSystem from 'fs';
+import FileSystem from 'fs/promises';
 import Path from 'path';
 
 const DEFAULT_REGEX = /^[^.].*?\.(?:js|ts)$/i;
@@ -17,7 +17,7 @@ class ImportDirectory {
 
   async import(directoryPath){
 
-    const filesPath = this.takeFilesPath({path: directoryPath, subfolders: this.subfolders})
+    const filesPath = (await this.takeFilesPath({path: directoryPath, subfolders: this.subfolders}))
       .filter((path) => this.regex.test(Path.basename( path )));
 
     const list = [];
@@ -44,10 +44,10 @@ class ImportDirectory {
   }
 
 
-  takeFilesPath({ path, subfolders, skipValidation }){
+  async takeFilesPath({ path, subfolders, skipValidation }){
     path = this.#toAbsolutePath(path);
 
-    const filesPath = FileSystem.readdirSync( path )
+    const filesPath = (await FileSystem.readdir( path ))
       .map(name => `${ path }/${ name }`);
 
     if (skipValidation){
@@ -65,12 +65,10 @@ class ImportDirectory {
 
 
     if (subfolders){
-      folders.forEach(path => {
-        const filesNames = this.takeFilesPath({ path, subfolders });
-
+      for (const path of folders){
+        const filesNames = await this.takeFilesPath({ path, subfolders });
         files.push(...filesNames);
-      });
-
+      }
     }
 
     return files;
@@ -87,8 +85,8 @@ class ImportDirectory {
 
 
 
-  fileIsFolder(filePath){
-    return FileSystem.lstatSync(filePath).isDirectory();
+  async fileIsFolder(filePath){
+    return (await FileSystem.lstat(filePath)).isDirectory();
   }
 
 
