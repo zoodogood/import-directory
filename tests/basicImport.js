@@ -20,5 +20,8 @@ const path = "./tests/folder";
 const importModules = async () => {
   const importDirectory = new ImportDirectory(options);
   const modules = await importDirectory.import(path);
+  if (modules.length < 1){
+    throw new Error("Modules not found");
+  }
 }
 it("Basic Import", importModules);
