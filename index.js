@@ -50,6 +50,7 @@ class ImportDirectory {
     const filesPath = (await FileSystem.readdir( path ))
       .map(name => `${ path }/${ name }`);
 
+
     if (skipValidation){
       return names;
     }
@@ -60,9 +61,8 @@ class ImportDirectory {
     const isFolder = this.fileIsFolder.bind(this);
 
     for (const path of filesPath)
-      (isFolder(path) ? folders : files)
+      (await isFolder(path) ? folders : files)
         .push(path);
-
 
     if (subfolders){
       for (const path of folders){
@@ -70,7 +70,6 @@ class ImportDirectory {
         files.push(...filesNames);
       }
     }
-
     return files;
   }
 
@@ -86,7 +85,8 @@ class ImportDirectory {
 
 
   async fileIsFolder(filePath){
-    return (await FileSystem.lstat(filePath)).isDirectory();
+    const stat = await FileSystem.lstat(filePath);
+    return stat.isDirectory();
   }
 
 
