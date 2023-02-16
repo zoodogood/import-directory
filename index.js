@@ -3,7 +3,28 @@ import Path from 'path';
 
 const DEFAULT_REGEX = /^[^.].*?\.(?:js|ts)$/i;
 
+
+/**
+ * @typedef ImportDirectoryOptions
+ * @property {boolean} [sync=true]
+ * @property {boolean} [subfolders=false]
+ * @property {RegExp} [regex = DEFAULT_REGEX]
+ * @property {Function} [callback]
+ * @property {boolean} [skipValidation=false]
+ * @property {string} [rootDirectory]
+ */
+
+/**
+ * @typedef takeFilePathOptions
+ * @property {string} path
+ * @property {boolean} [skipValidation]
+ * @property {boolean} [subfolders]
+*/
+
 class ImportDirectory {
+  /**
+   * @param {ImportDirectoryOptions} param0 
+   */
   constructor({sync = true, subfolders = false, regex = DEFAULT_REGEX, callback, skipValidation = false, rootDirectory} = {}){
     this.sync       = sync;
     this.subfolders = subfolders;
@@ -15,6 +36,10 @@ class ImportDirectory {
     this.rootDirectory = rootDirectory ?? process.cwd();
   }
 
+  /**
+   * @param {string} directoryPath 
+   * @returns {Promise<module[]>}
+   */
   async import(directoryPath){
 
     const filesPath = (await this.takeFilesPath({path: directoryPath, subfolders: this.subfolders}))
@@ -44,6 +69,11 @@ class ImportDirectory {
   }
 
 
+  /**
+   * 
+   * @param {takeFilePathOptions} param0 
+   * @returns {Promise<string[]>}
+  */
   async takeFilesPath({ path, subfolders, skipValidation }){
     path = this.#toAbsolutePath(path);
 
@@ -52,7 +82,7 @@ class ImportDirectory {
 
 
     if (skipValidation){
-      return names;
+      return filesPath;
     }
 
     const folders = [];
@@ -73,6 +103,11 @@ class ImportDirectory {
     return files;
   }
 
+  /**
+   * 
+   * @param {string} path 
+   * @returns {Promise<module>}
+   */
   async importFile(path){
     path = this.#normalizePath(
       this.#toAbsolutePath(path)
@@ -83,13 +118,21 @@ class ImportDirectory {
 
 
 
-
+  /**
+   * 
+   * @param {string} filePath 
+   * @returns {Promise<boolean>}
+   */
   async fileIsFolder(filePath){
     const stat = await FileSystem.lstat(filePath);
     return stat.isDirectory();
   }
 
 
+  /**
+   * @param {string} path 
+   * @returns {string}
+   */
   #normalizePath(path){
     const isAbsolute = Path.isAbsolute(path);
     if (!isAbsolute)
@@ -98,6 +141,10 @@ class ImportDirectory {
     return `file:${ path }`;
   }
 
+  /**
+   * @param {string} path 
+   * @returns {string}
+  */
   #toAbsolutePath(path){
     const isAbsolute = Path.isAbsolute(path);
     if (isAbsolute){
