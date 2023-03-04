@@ -42,8 +42,8 @@ class ImportDirectory {
    */
   async import(directoryPath){
 
-    const filesPath = (await this.takeFilesPath({path: directoryPath, subfolders: this.subfolders}))
-      .filter((path) => this.regex.test(Path.basename( path )));
+    const filesPath = await this.takeFilesPath({path: directoryPath, subfolders: this.subfolders});
+      
 
     const list = [];
     const promises = [];
@@ -75,32 +75,10 @@ class ImportDirectory {
    * @returns {Promise<string[]>}
   */
   async takeFilesPath({ path, subfolders, skipValidation }){
-    path = this.#toAbsolutePath(path);
-
-    const filesPath = (await FileSystem.readdir( path ))
-      .map(name => `${ path }/${ name }`);
-
-
-    if (skipValidation){
-      return filesPath;
-    }
-
-    const folders = [];
-    const files   = [];
-
-    const isFolder = this.fileIsFolder.bind(this);
-
-    for (const path of filesPath)
-      (await isFolder(path) ? folders : files)
-        .push(path);
-
-    if (subfolders){
-      for (const path of folders){
-        const filesNames = await this.takeFilesPath({ path, subfolders });
-        files.push(...filesNames);
-      }
-    }
-    return files;
+    const filesPaths = await this.#findFilesInDirectory({ path, subfolders, skipValidation });
+    const isValidPath = (path) => this.regex.test(Path.basename( path ));
+    
+    return filesPaths.filter(isValidPath);
   }
 
   /**
@@ -153,6 +131,40 @@ class ImportDirectory {
 
     path = `${ this.rootDirectory }/${ path }`;
     return path;
+  }
+
+  /**
+   * 
+   * @param {takeFilePathOptions} param0 
+   * @returns {Promise<string[]>}
+  */
+  async #findFilesInDirectory({ path, subfolders, skipValidation }){
+    path = this.#toAbsolutePath(path);
+
+    const filesPath = (await FileSystem.readdir( path ))
+      .map(name => `${ path }/${ name }`);
+
+
+    if (skipValidation){
+      return filesPath;
+    }
+
+    const folders = [];
+    const files   = [];
+
+    const isFolder = this.fileIsFolder.bind(this);
+
+    for (const path of filesPath)
+      (await isFolder(path) ? folders : files)
+        .push(path);
+
+    if (subfolders){
+      for (const path of folders){
+        const filesNames = await this.#findFilesInDirectory({ path, subfolders });
+        files.push(...filesNames);
+      }
+    }
+    return files;
   }
 
 }
