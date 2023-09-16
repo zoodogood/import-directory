@@ -1,4 +1,4 @@
-import { ImportDirectory } from '../index.js';
+import { ImportDirectory } from '../lib/index.js';
 
 let counter = 0;
 const callback = () => counter++;
