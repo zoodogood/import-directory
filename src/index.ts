@@ -4,28 +4,30 @@ import Path from 'path';
 const DEFAULT_REGEX = /^[^.].*?\.(?:js|ts)$/i;
 
 
-/**
- * @typedef ImportDirectoryOptions
- * @property {boolean} [sync=true]
- * @property {boolean} [subfolders=false]
- * @property {RegExp} [regex = DEFAULT_REGEX]
- * @property {Function} [callback]
- * @property {boolean} [skipValidation=false]
- * @property {string} [rootDirectory]
- */
+interface IImportDirectoryOptions {
+  sync?: boolean;
+  subfolders?: boolean;
+  regex?: RegExp;
+  callback?: CallableFunction | null;
+  skipValidation?: boolean;
+  rootDirectory?: string;
+}
 
-/**
- * @typedef takeFilePathOptions
- * @property {string} path
- * @property {boolean} [skipValidation]
- * @property {boolean} [subfolders]
-*/
+interface ITakeFilePathOptions {
+  path: string;
+  skipValidation?: boolean;
+  subfolders?: boolean;
+}
 
-class ImportDirectory {
-  /**
-   * @param {ImportDirectoryOptions} param0 
-   */
-  constructor({sync = true, subfolders = false, regex = DEFAULT_REGEX, callback, skipValidation = false, rootDirectory} = {}){
+class ImportDirectory<T> {
+  declare regex: RegExp;
+  declare sync: boolean;
+  declare subfolders: boolean;
+  declare callback?: IImportDirectoryOptions["callback"];
+  declare skipValidation: boolean;
+  declare rootDirectory: string;
+  
+  constructor({sync = true, subfolders = false, regex = DEFAULT_REGEX, callback, skipValidation = false, rootDirectory}: IImportDirectoryOptions = {}){
     this.sync       = sync;
     this.subfolders = subfolders;
     this.regex      = regex;
@@ -36,16 +38,13 @@ class ImportDirectory {
     this.rootDirectory = rootDirectory ?? process.cwd();
   }
 
-  /**
-   * @param {string} directoryPath 
-   * @returns {Promise<module[]>}
-   */
-  async import(directoryPath){
+  
+  async import(directoryPath: string){
 
     const filesPath = await this.takeFilesPath({path: directoryPath, subfolders: this.subfolders});
       
 
-    const list = [];
+    const list: T[] = [];
     const promises = [];
 
 
@@ -69,24 +68,16 @@ class ImportDirectory {
   }
 
 
-  /**
-   * 
-   * @param {takeFilePathOptions} param0 
-   * @returns {Promise<string[]>}
-  */
-  async takeFilesPath({ path, subfolders, skipValidation }){
+  
+  async takeFilesPath({ path, subfolders, skipValidation }: ITakeFilePathOptions){
     const filesPaths = await this.#findFilesInDirectory({ path, subfolders, skipValidation });
-    const isValidPath = (path) => this.regex.test(Path.basename( path ));
+    const isValidPath = (path: string) => this.regex.test(Path.basename( path ));
     
     return filesPaths.filter(isValidPath);
   }
 
-  /**
-   * 
-   * @param {string} path 
-   * @returns {Promise<module>}
-   */
-  async importFile(path){
+  
+  async importFile(path: string): Promise<T>{
     path = this.#normalizePath(
       this.#toAbsolutePath(path)
     );
@@ -95,35 +86,28 @@ class ImportDirectory {
   }
 
 
-
-  /**
-   * 
-   * @param {string} filePath 
-   * @returns {Promise<boolean>}
-   */
-  async fileIsFolder(filePath){
+  
+  async fileIsFolder(filePath: string): Promise<boolean>{
     const stat = await FileSystem.lstat(filePath);
     return stat.isDirectory();
   }
 
 
-  /**
-   * @param {string} path 
-   * @returns {string}
-   */
-  #normalizePath(path){
+  
+  #normalizePath(path: string): string{
+    path = path.replaceAll("\\", "/");
+
     const isAbsolute = Path.isAbsolute(path);
     if (!isAbsolute)
       return path;
 
-    return `file:${ path }`;
+    path = path.replace(/^.*?(?=\/)/, "");
+
+    return `${ path }`;
   }
 
-  /**
-   * @param {string} path 
-   * @returns {string}
-  */
-  #toAbsolutePath(path){
+  
+  #toAbsolutePath(path: string): string{
     const isAbsolute = Path.isAbsolute(path);
     if (isAbsolute){
       return path;
@@ -132,13 +116,8 @@ class ImportDirectory {
     path = `${ this.rootDirectory }/${ path }`;
     return path;
   }
-
-  /**
-   * 
-   * @param {takeFilePathOptions} param0 
-   * @returns {Promise<string[]>}
-  */
-  async #findFilesInDirectory({ path, subfolders, skipValidation }){
+  
+  async #findFilesInDirectory({ path, subfolders, skipValidation }: ITakeFilePathOptions): Promise<string[]>{
     path = this.#toAbsolutePath(path);
 
     const filesPath = (await FileSystem.readdir( path ))
@@ -149,8 +128,8 @@ class ImportDirectory {
       return filesPath;
     }
 
-    const folders = [];
-    const files   = [];
+    const folders: string[] = [];
+    const files: string[]   = [];
 
     const isFolder = this.fileIsFolder.bind(this);
 
