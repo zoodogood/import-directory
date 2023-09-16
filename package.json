@@ -1,11 +1,14 @@
 {
   "name": "@zoodogood/import-directory",
   "type": "module",
-  "version": "1.4.1",
+  "version": "1.5.2",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "typings": "lib/index",
   "scripts": {
-    "test": "mocha ./tests/*.js"
+    "test": "mocha ./tests/*.js",
+    "prepack": "tsc"
   },
   "repository": {
     "type": "git",
@@ -15,6 +18,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^20.6.2",
     "mocha": "^10.0.0"
-  }
+  },
+  "files": ["/lib/**/*"]
 }
